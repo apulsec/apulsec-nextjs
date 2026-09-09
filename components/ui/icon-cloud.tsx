@@ -18,8 +18,13 @@ interface Icon {
 interface IconCloudProps {
   icons?: React.ReactNode[]
   images?: string[]
+  items?: Array<React.ReactElement | string>
   showControl?: boolean
 }
+
+const EMPTY_ITEMS: React.ReactNode[] = []
+const ICON_CANVAS_SIZE = 48
+const CLOUD_RADIUS = 125
 
 function easeOutCubic(t: number): number {
   return 1 - Math.pow(1 - t, 3)
@@ -28,6 +33,7 @@ function easeOutCubic(t: number): number {
 export function IconCloud({
   icons,
   images,
+  items,
   showControl = true,
 }: IconCloudProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -67,61 +73,64 @@ export function IconCloud({
 
   // Create icon canvases once when icons/images change
   useEffect(() => {
-    if (!icons && !images) return
+    if (!icons && !images && !items) return
 
-    const items = icons ?? images ?? []
-    imagesLoadedRef.current = new Array(items.length).fill(false)
+    const itemList = items ?? icons ?? images ?? EMPTY_ITEMS
+    imagesLoadedRef.current = new Array(itemList.length).fill(false)
 
-    const newIconCanvases = items.map((item, index) => {
+    const newIconCanvases = itemList.map((item, index) => {
       const offscreen = document.createElement("canvas")
-      offscreen.width = 40
-      offscreen.height = 40
+      offscreen.width = ICON_CANVAS_SIZE
+      offscreen.height = ICON_CANVAS_SIZE
       const offCtx = offscreen.getContext("2d")
 
       if (offCtx) {
-        if (images) {
-          // Handle image URLs directly
+        if (typeof item === "string") {
+          // 处理 public 目录中的 SVG 或其他图片资源。
           const img = new Image()
           img.crossOrigin = "anonymous"
-          img.src = items[index] as string
+          img.src = item
           img.onload = () => {
             offCtx.clearRect(0, 0, offscreen.width, offscreen.height)
+            offCtx.drawImage(
+              img,
+              0,
+              0,
+              ICON_CANVAS_SIZE,
+              ICON_CANVAS_SIZE
+            )
 
-            // Create circular clipping path
-            offCtx.beginPath()
-            offCtx.arc(20, 20, 20, 0, Math.PI * 2)
-            offCtx.closePath()
-            offCtx.clip()
-
-            // Draw the image
-            offCtx.drawImage(img, 0, 0, 40, 40)
-
+            imagesLoadedRef.current[index] = true
+          }
+          img.onerror = () => {
             imagesLoadedRef.current[index] = true
           }
         } else {
-          // Handle SVG icons
-          offCtx.scale(0.4, 0.4)
-          const svgString = renderToString(item as React.ReactElement)
+          // 将 React SVG 图标转成图片，统一交给 Canvas 绘制。
+          const svgString = renderToString(item)
           const img = new Image()
-          img.src = "data:image/svg+xml;base64," + btoa(svgString)
           img.onload = () => {
             offCtx.clearRect(0, 0, offscreen.width, offscreen.height)
-            offCtx.drawImage(img, 0, 0)
+            offCtx.drawImage(img, 0, 0, ICON_CANVAS_SIZE, ICON_CANVAS_SIZE)
             imagesLoadedRef.current[index] = true
           }
+          img.onerror = () => {
+            imagesLoadedRef.current[index] = true
+          }
+          img.src = "data:image/svg+xml;base64," + btoa(svgString)
         }
       }
       return offscreen
     })
 
     iconCanvasesRef.current = newIconCanvases
-  }, [icons, images])
+  }, [icons, images, items])
 
   // Generate initial icon positions on a sphere
   useEffect(() => {
-    const items = icons ?? images ?? []
+    const itemList = items ?? icons ?? images ?? EMPTY_ITEMS
     const newIcons: Icon[] = []
-    const numIcons = items.length || 20
+    const numIcons = itemList.length || 20
 
     // Fibonacci sphere parameters
     const offset = 2 / numIcons
@@ -136,16 +145,16 @@ export function IconCloud({
       const z = Math.sin(phi) * r
 
       newIcons.push({
-        x: x * 100,
-        y: y * 100,
-        z: z * 100,
+        x: x * CLOUD_RADIUS,
+        y: y * CLOUD_RADIUS,
+        z: z * CLOUD_RADIUS,
         scale: 1,
         opacity: 1,
         id: i,
       })
     }
     setIconPositions(newIcons)
-  }, [icons, images])
+  }, [icons, images, items])
 
   // Handle mouse events
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -172,7 +181,7 @@ export function IconCloud({
       const screenY = canvasRef.current!.height / 2 + rotatedY
 
       const scale = (rotatedZ + 200) / 300
-      const radius = 20 * scale
+      const radius = (ICON_CANVAS_SIZE / 2) * scale
       const dx = x - screenX
       const dy = y - screenY
 
@@ -294,13 +303,19 @@ export function IconCloud({
           ctx.scale(scale, scale)
           ctx.globalAlpha = opacity
 
-          if (icons || images) {
+          if (icons || images || items) {
             // Only try to render icons/images if they exist
             if (
               iconCanvasesRef.current[index] &&
               imagesLoadedRef.current[index]
             ) {
-              ctx.drawImage(iconCanvasesRef.current[index], -20, -20, 40, 40)
+              ctx.drawImage(
+                iconCanvasesRef.current[index],
+                -ICON_CANVAS_SIZE / 2,
+                -ICON_CANVAS_SIZE / 2,
+                ICON_CANVAS_SIZE,
+                ICON_CANVAS_SIZE
+              )
             }
           } else {
             // Show numbered circles if no icons/images are provided
@@ -319,7 +334,7 @@ export function IconCloud({
         })
 
         const hasPendingAssets =
-          Boolean(icons || images) &&
+          Boolean(icons || images || items) &&
           !imagesLoadedRef.current.every((loaded) => loaded)
         const shouldContinue =
           !isPaused || isDragging || targetRotation !== null || hasPendingAssets
@@ -340,6 +355,7 @@ export function IconCloud({
   }, [
     icons,
     images,
+    items,
     iconPositions,
     isDragging,
     isPaused,

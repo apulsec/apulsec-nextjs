@@ -1,26 +1,33 @@
 import Link from "next/link"
 import {
-  ArrowUpRight,
-  BookOpenText,
-  Code2,
-  GitBranch,
-  Layers3,
-  Sparkles,
-} from "lucide-react"
+  IconBrandCpp,
+  IconBrandDocker,
+  IconBrandGit,
+  IconBrandNextjs,
+  IconBrandOpenai,
+  IconBrandPython,
+  IconBrandReact,
+  IconBrandUbuntu,
+  IconBrandVscode,
+  IconFileTypeJs,
+  IconFileTypeTs,
+  IconMarkdown,
+} from "@tabler/icons-react"
+import { ArrowUpRight, BookOpenText, Layers3 } from "lucide-react"
 
 import CalendarCard from "@/components/calendar-card"
+import { GitHubHeatmap } from "@/components/github-heatmap"
 import LocationGlobe from "@/components/location-globe"
+import { PixelImageCarousel } from "@/components/pixel-image-carousel"
+import { IconCloud } from "@/components/ui/icon-cloud"
 import { TypingAnimation } from "@/components/ui/typing-animation"
 
 const cardClass =
   "relative overflow-hidden rounded-3xl border border-border/60 bg-secondary/35 shadow-[0_18px_60px_rgb(23_77_132_/_0.08)] backdrop-blur-xl"
 
-const tagClass =
-  "rounded-full border border-border/60 bg-background/35 px-3 py-1 text-xs text-muted-foreground"
-
 export default function Page() {
   return (
-    <div className="relative isolate min-h-svh overflow-hidden px-4 pt-8 pb-4 sm:pt-10 sm:pb-6">
+    <div className="relative isolate min-h-svh overflow-hidden px-5 pt-8 pb-4 sm:px-6 sm:pt-10 sm:pb-6">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
@@ -31,11 +38,9 @@ export default function Page() {
       </div>
 
       {/* 响应式 Bento 网格：通过命名区域控制每个模块的位置。 */}
-      <section
-        className="mx-auto grid max-w-[375px] grid-cols-2 gap-6 sm:max-w-screen-sm sm:grid-cols-3 xl:max-w-screen-xl xl:grid-cols-4 [grid-template-areas:'a_a'_'a_a'_'b_d'_'e_c'_'h_h'_'f_g'_'l_l'] sm:[grid-template-areas:'a_a_b'_'a_a_l'_'c_d_d'_'e_f_g'_'h_h_h'] xl:[grid-template-areas:'a_a_b_l'_'c_d_d_e'_'f_g_g_h']"
-      >
+      <section className="mx-auto grid max-w-[375px] grid-cols-2 gap-6 [grid-template-areas:'a_a'_'a_a'_'b_d'_'e_c'_'h_h'_'f_g'_'l_l'] sm:max-w-screen-sm sm:grid-cols-3 sm:[grid-template-areas:'a_a_b'_'a_a_l'_'c_d_d'_'e_f_g'_'h_h_h'] xl:max-w-screen-xl xl:grid-cols-4 xl:[grid-template-areas:'a_a_b_l'_'c_d_d_e'_'f_g_g_h']">
         <article
-          className={`${cardClass} flex min-h-[240px] flex-col justify-between p-6 sm:min-h-[270px] xl:min-h-[300px] [grid-area:a]`}
+          className={`${cardClass} flex min-h-[240px] flex-col justify-between p-6 [grid-area:a] sm:min-h-[270px] xl:min-h-[300px]`}
         >
           <div>
             {/* <div className="mb-6 flex items-center justify-between gap-4">
@@ -55,8 +60,17 @@ export default function Page() {
             >
               Light years.🍭
             </TypingAnimation>
-            <p className="mt-4 max-w-xl text-sm leading-7 text-muted-foreground sm:text-base">
-              这里记录我正在学习的技术、正在制作的项目，以及生活中值得留下来的片段。
+            <p className="mt-4 max-w-xl text-xs leading-7 text-muted-foreground sm:text-sm">
+              🎓 A Grade 2022 CS Student in SEU. Currently pursuing a
+              master&apos;s degree at SEU.
+              <br />
+              ⚡ Interested in signal processing and
+              front-end development.
+              <br />
+              🎮 I am a hardcore anime fan, and I also enjoy playing all kinds
+              of games.
+              <br />
+              🔭 I am learning everything I find interesting.
             </p>
           </div>
 
@@ -67,7 +81,9 @@ export default function Page() {
           </div> */}
         </article>
 
-        <article className={`${cardClass} min-h-[250px] [grid-area:b]`}>
+        <article
+          className={`${cardClass} min-h-[250px] [grid-area:b] sm:min-h-[270px] xl:min-h-[300px]`}
+        >
           <LocationGlobe />
         </article>
 
@@ -100,7 +116,9 @@ export default function Page() {
           </Link>
         </article>
 
-        <article className={`${cardClass} flex aspect-square min-h-0 items-center justify-center p-0 [grid-area:e]`}>
+        <article
+          className={`${cardClass} flex aspect-square min-h-0 items-center justify-center p-0 [grid-area:e]`}
+        >
           <CalendarCard />
         </article>
 
@@ -131,38 +149,35 @@ export default function Page() {
         <article
           className={`${cardClass} flex aspect-square min-h-[160px] flex-col justify-between p-5 [grid-area:f]`}
         >
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <Code2 className="size-4 text-primary" />
-            技术栈
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {["TypeScript", "Tailwind CSS", "shadcn/ui", "Motion", "Cobe"].map(
-              (item) => (
-                <span key={item} className={tagClass}>
-                  {item}
-                </span>
-              ),
-            )}
+          <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden">
+            <div className="origin-center scale-[0.46] [&_canvas]:brightness-0 dark:[&_canvas]:invert sm:scale-[0.54] xl:scale-[0.75]">
+              <IconCloud
+                showControl={false}
+                items={[
+                  <IconBrandPython key="python" color="#000000" size={80} />,
+                  "/icons/pytorch.svg",
+                  <IconBrandNextjs key="nextjs" color="#000000" size={80} />,
+                  <IconFileTypeJs key="javascript" color="#000000" size={80} />,
+                  <IconFileTypeTs key="typescript" color="#000000" size={80} />,
+                  <IconBrandCpp key="cpp" color="#000000" size={80} />,
+                  <IconBrandGit key="git" color="#000000" size={80} />,
+                  <IconBrandDocker key="docker" color="#000000" size={80} />,
+                  <IconBrandOpenai key="gpt" color="#000000" size={80} />,
+                  <IconBrandReact key="react" color="#000000" size={80} />,
+                  "/icons/matlab.svg",
+                  <IconBrandVscode key="vscode" color="#000000" size={80} />,
+                  <IconBrandUbuntu key="linux" color="#000000" size={80} />,
+                  <IconMarkdown key="markdown" color="#000000" size={80} />,
+                ]}
+              />
+            </div>
           </div>
         </article>
 
         <article
-          className={`${cardClass} flex aspect-square min-h-[160px] flex-col justify-between p-5 xl:aspect-auto [grid-area:g]`}
+          className={`${cardClass} flex aspect-square min-h-[160px] flex-col justify-between p-5 [grid-area:g] xl:aspect-auto`}
         >
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <GitBranch className="size-4 text-primary" />
-            关于这个主页
-          </div>
-          <p className="text-sm leading-6 text-muted-foreground">
-            这是一个使用 Next.js、Tailwind CSS 和 shadcn/ui 搭建的个人主页，后续会逐步加入文章、项目和更多互动模块。
-          </p>
-          <Link
-            href="/about"
-            className="inline-flex w-fit items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary/70"
-          >
-            了解更多
-            <ArrowUpRight className="size-4" />
-          </Link>
+          <GitHubHeatmap />
         </article>
 
         <article
@@ -180,26 +195,9 @@ export default function Page() {
         </article>
 
         <article
-          className={`${cardClass} flex aspect-square min-h-[160px] flex-col justify-between p-5 [grid-area:l]`}
+          className={`${cardClass} flex aspect-square min-h-[160px] flex-col p-5 [grid-area:l] xl:aspect-auto xl:min-h-[300px]`}
         >
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <Sparkles className="size-4 text-primary" />
-            快速入口
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <Link
-              href="/blog"
-              className="rounded-2xl border border-border/60 bg-background/25 p-3 transition-colors hover:bg-background/45"
-            >
-              文章
-            </Link>
-            <Link
-              href="/about"
-              className="rounded-2xl border border-border/60 bg-background/25 p-3 transition-colors hover:bg-background/45"
-            >
-              关于我
-            </Link>
-          </div>
+          <PixelImageCarousel />
         </article>
       </section>
     </div>
