@@ -1,35 +1,12 @@
-"use client"
-
-import { useState } from "react"
-import { CalendarDays } from "lucide-react"
-
 import { Calendar } from "@/components/ui/calendar"
 
 export default function CalendarCard() {
-  const [date, setDate] = useState<Date | undefined>(new Date())
-
   return (
-    <div className="flex h-full flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm font-medium">
-          <CalendarDays className="size-4 text-primary" />
-          日历
-        </div>
-        <span className="text-xs text-muted-foreground">Pick a day</span>
-      </div>
-
+    <div className="flex h-full items-center justify-center">
+      {/* 保留完整月历外观，但不传入 selection props，不显示日期选择状态。 */}
       <Calendar
-        mode="single"
-        selected={date}
-        onSelect={setDate}
-        className="mx-auto rounded-2xl border border-border/60 bg-background/20"
+        className="max-w-full rounded-2xl border border-border/60 bg-background/20 [--cell-size:--spacing(5)] sm:[--cell-size:--spacing(6)] xl:[--cell-size:--spacing(7)]"
       />
-
-      <p className="mt-auto text-xs text-muted-foreground">
-        {date
-          ? `当前选择：${date.toLocaleDateString("zh-CN")}`
-          : "请选择一个日期"}
-      </p>
     </div>
   )
 }

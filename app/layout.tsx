@@ -25,7 +25,7 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
-          <div className="pb-24">{children}</div>
+          <div className="pb-0">{children}</div>
           <SiteFloatingDock />
         </ThemeProvider>
       </body>

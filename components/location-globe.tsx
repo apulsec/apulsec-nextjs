@@ -95,47 +95,49 @@ export default function LocationGlobe() {
   }, [isDark, r])
 
   return (
-    <div className="relative flex min-h-80 w-full flex-col overflow-hidden rounded-3xl p-4">
-      <div className="flex items-center gap-2">
+    <div className="relative flex h-full min-h-[250px] w-full flex-col overflow-hidden rounded-3xl p-4">
+      <div className="relative z-10 flex items-center gap-2">
         <MapPinIcon className="size-5" />
         <h2 className="text-sm font-light">China, Nanjing</h2>
       </div>
 
-      <div className="absolute inset-x-0 bottom-[-15%] mx-auto aspect-square w-[80%] max-w-90">
-        <div
-          className="h-full w-full"
-          style={{
-            WebkitMaskImage:
-              "radial-gradient(circle at 50% 50%, black 60%, transparent 70%)",
-            maskImage:
-              "radial-gradient(circle at 50% 50%, black 60%, transparent 70%)",
-          }}
-        >
-          <canvas
-            ref={canvasRef}
-            className="h-full w-full touch-none"
-            onPointerDown={(event) => {
-              pointerInteracting.current =
-                event.clientX - pointerMovement.current
+      <div className="flex min-h-0 flex-1 items-center justify-center">
+        <div className="relative aspect-square w-[80%] max-w-[280px]">
+          <div
+            className="h-full w-full"
+            style={{
+              WebkitMaskImage:
+                "radial-gradient(circle at 50% 50%, black 60%, transparent 70%)",
+              maskImage:
+                "radial-gradient(circle at 50% 50%, black 60%, transparent 70%)",
             }}
-            onPointerMove={(event) => {
-              if (pointerInteracting.current !== null) {
-                const delta = event.clientX - pointerInteracting.current
+          >
+            <canvas
+              ref={canvasRef}
+              className="block h-full w-full touch-none"
+              onPointerDown={(event) => {
+                pointerInteracting.current =
+                  event.clientX - pointerMovement.current
+              }}
+              onPointerMove={(event) => {
+                if (pointerInteracting.current !== null) {
+                  const delta = event.clientX - pointerInteracting.current
 
-                pointerMovement.current = delta
+                  pointerMovement.current = delta
 
-                void api.start({
-                  r: delta / 200,
-                })
-              }
-            }}
-            onPointerUp={() => {
-              pointerInteracting.current = null
-            }}
-            onPointerLeave={() => {
-              pointerInteracting.current = null
-            }}
-          />
+                  void api.start({
+                    r: delta / 200,
+                  })
+                }
+              }}
+              onPointerUp={() => {
+                pointerInteracting.current = null
+              }}
+              onPointerLeave={() => {
+                pointerInteracting.current = null
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>

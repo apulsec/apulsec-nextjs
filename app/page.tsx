@@ -19,7 +19,7 @@ const tagClass =
 
 export default function Page() {
   return (
-    <div className="relative isolate min-h-svh overflow-hidden px-4 py-8 sm:py-10">
+    <div className="relative isolate min-h-svh overflow-hidden px-4 pt-8 pb-4 sm:pt-10 sm:pb-6">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
@@ -29,11 +29,12 @@ export default function Page() {
         <div className="absolute -bottom-48 -left-32 h-96 w-96 rounded-full bg-secondary/60 blur-3xl" />
       </div>
 
+      {/* 响应式 Bento 网格：通过命名区域控制每个模块的位置。 */}
       <section
         className="mx-auto grid max-w-[375px] grid-cols-2 gap-4 sm:max-w-screen-sm sm:grid-cols-3 xl:max-w-screen-xl xl:grid-cols-4 [grid-template-areas:'a_a'_'a_a'_'b_d'_'e_c'_'h_h'_'f_g'_'l_l'] sm:[grid-template-areas:'a_a_b'_'a_a_l'_'c_d_d'_'e_f_g'_'h_h_h'] xl:[grid-template-areas:'a_a_b_l'_'c_d_d_e'_'f_g_g_h']"
       >
         <article
-          className={`${cardClass} flex min-h-[300px] flex-col justify-between p-6 sm:min-h-[340px] xl:min-h-[390px] [grid-area:a]`}
+          className={`${cardClass} flex min-h-[240px] flex-col justify-between p-6 sm:min-h-[270px] xl:min-h-[300px] [grid-area:a]`}
         >
           <div>
             {/* <div className="mb-6 flex items-center justify-between gap-4">
@@ -46,7 +47,7 @@ export default function Page() {
             </div> */}
 
             <h1 className="max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl">
-              你好，欢迎来到我的空间。
+              Light years.
             </h1>
             <p className="mt-4 max-w-xl text-sm leading-7 text-muted-foreground sm:text-base">
               这里记录我正在学习的技术、正在制作的项目，以及生活中值得留下来的片段。
@@ -60,12 +61,12 @@ export default function Page() {
           </div> */}
         </article>
 
-        <article className={`${cardClass} min-h-[320px] [grid-area:b]`}>
+        <article className={`${cardClass} min-h-[250px] [grid-area:b]`}>
           <LocationGlobe />
         </article>
 
         <article
-          className={`${cardClass} flex min-h-[210px] flex-col justify-between p-5 [grid-area:d]`}
+          className={`${cardClass} flex min-h-[180px] flex-col justify-between p-5 [grid-area:d]`}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm font-medium">
@@ -93,12 +94,12 @@ export default function Page() {
           </Link>
         </article>
 
-        <article className={`${cardClass} min-h-[320px] p-5 [grid-area:e]`}>
+        <article className={`${cardClass} flex min-h-[230px] items-center p-3 [grid-area:e]`}>
           <CalendarCard />
         </article>
 
         <article
-          className={`${cardClass} flex min-h-[220px] flex-col justify-between p-5 [grid-area:c]`}
+          className={`${cardClass} flex aspect-square min-h-[160px] flex-col justify-between p-5 [grid-area:c]`}
         >
           <div className="flex items-center gap-2 text-sm font-medium">
             <Layers3 className="size-4 text-primary" />
@@ -122,7 +123,7 @@ export default function Page() {
         </article>
 
         <article
-          className={`${cardClass} flex min-h-[180px] flex-col justify-between p-5 [grid-area:f]`}
+          className={`${cardClass} flex aspect-square min-h-[160px] flex-col justify-between p-5 [grid-area:f]`}
         >
           <div className="flex items-center gap-2 text-sm font-medium">
             <Code2 className="size-4 text-primary" />
@@ -140,7 +141,7 @@ export default function Page() {
         </article>
 
         <article
-          className={`${cardClass} flex min-h-[180px] flex-col justify-between p-5 [grid-area:g]`}
+          className={`${cardClass} flex aspect-square min-h-[160px] flex-col justify-between p-5 xl:aspect-auto [grid-area:g]`}
         >
           <div className="flex items-center gap-2 text-sm font-medium">
             <GitBranch className="size-4 text-primary" />
@@ -159,7 +160,7 @@ export default function Page() {
         </article>
 
         <article
-          className={`${cardClass} relative flex min-h-[240px] items-end p-6 [grid-area:h]`}
+          className={`${cardClass} relative flex min-h-[200px] items-end p-6 [grid-area:h]`}
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,oklch(0.95_0.08_230_/_0.8),transparent_35%),linear-gradient(135deg,transparent_30%,oklch(0.55_0.12_240_/_0.18))] dark:bg-[radial-gradient(circle_at_25%_20%,oklch(0.55_0.12_240_/_0.25),transparent_35%),linear-gradient(135deg,transparent_30%,oklch(0.35_0.12_240_/_0.3))]" />
           <div className="relative max-w-lg">
@@ -173,7 +174,7 @@ export default function Page() {
         </article>
 
         <article
-          className={`${cardClass} flex min-h-[180px] flex-col justify-between p-5 [grid-area:l]`}
+          className={`${cardClass} flex aspect-square min-h-[160px] flex-col justify-between p-5 [grid-area:l]`}
         >
           <div className="flex items-center gap-2 text-sm font-medium">
             <Sparkles className="size-4 text-primary" />
