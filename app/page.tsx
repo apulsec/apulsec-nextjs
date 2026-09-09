@@ -10,6 +10,7 @@ import {
 
 import CalendarCard from "@/components/calendar-card"
 import LocationGlobe from "@/components/location-globe"
+import { TypingAnimation } from "@/components/ui/typing-animation"
 
 const cardClass =
   "relative overflow-hidden rounded-3xl border border-border/60 bg-secondary/35 shadow-[0_18px_60px_rgb(23_77_132_/_0.08)] backdrop-blur-xl"
@@ -31,7 +32,7 @@ export default function Page() {
 
       {/* 响应式 Bento 网格：通过命名区域控制每个模块的位置。 */}
       <section
-        className="mx-auto grid max-w-[375px] grid-cols-2 gap-4 sm:max-w-screen-sm sm:grid-cols-3 xl:max-w-screen-xl xl:grid-cols-4 [grid-template-areas:'a_a'_'a_a'_'b_d'_'e_c'_'h_h'_'f_g'_'l_l'] sm:[grid-template-areas:'a_a_b'_'a_a_l'_'c_d_d'_'e_f_g'_'h_h_h'] xl:[grid-template-areas:'a_a_b_l'_'c_d_d_e'_'f_g_g_h']"
+        className="mx-auto grid max-w-[375px] grid-cols-2 gap-6 sm:max-w-screen-sm sm:grid-cols-3 xl:max-w-screen-xl xl:grid-cols-4 [grid-template-areas:'a_a'_'a_a'_'b_d'_'e_c'_'h_h'_'f_g'_'l_l'] sm:[grid-template-areas:'a_a_b'_'a_a_l'_'c_d_d'_'e_f_g'_'h_h_h'] xl:[grid-template-areas:'a_a_b_l'_'c_d_d_e'_'f_g_g_h']"
       >
         <article
           className={`${cardClass} flex min-h-[240px] flex-col justify-between p-6 sm:min-h-[270px] xl:min-h-[300px] [grid-area:a]`}
@@ -46,9 +47,14 @@ export default function Page() {
               </div>
             </div> */}
 
-            <h1 className="max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl">
-              Light years.
-            </h1>
+            <TypingAnimation
+              as="h1"
+              delay={250}
+              duration={110}
+              className="max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl"
+            >
+              Light years.🍭
+            </TypingAnimation>
             <p className="mt-4 max-w-xl text-sm leading-7 text-muted-foreground sm:text-base">
               这里记录我正在学习的技术、正在制作的项目，以及生活中值得留下来的片段。
             </p>
@@ -94,7 +100,7 @@ export default function Page() {
           </Link>
         </article>
 
-        <article className={`${cardClass} flex min-h-[230px] items-center p-3 [grid-area:e]`}>
+        <article className={`${cardClass} flex aspect-square min-h-0 items-center justify-center p-0 [grid-area:e]`}>
           <CalendarCard />
         </article>
 
