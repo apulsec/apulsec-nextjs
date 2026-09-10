@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { Particles } from "@/components/ui/particles"
 
 export default function CalendarCard() {
   const [now, setNow] = useState(() => new Date())
@@ -35,9 +36,16 @@ export default function CalendarCard() {
 
   return (
     <div className="relative flex h-full min-h-0 w-full flex-col items-center justify-center overflow-hidden px-3 py-4 text-center xl:px-5 xl:py-5">
-      {/* <div className="pointer-events-none absolute -top-12 left-1/2 size-36 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" /> */}
+      <Particles
+        className="absolute inset-0 z-0 opacity-50"
+        quantity={45}
+        staticity={35}
+        ease={60}
+        size={0.5}
+        color="#60a5fa"
+      />
 
-      <div className="relative flex w-full flex-col items-center">
+      <div className="relative z-10 flex w-full flex-col items-center">
         {/* 使用浏览器本地时间，每秒刷新一次。 */}
         <p className="text-[0.65rem] font-bold tracking-[0.24em] text-primary uppercase xl:text-sm xl:tracking-[0.3em]">
           Today

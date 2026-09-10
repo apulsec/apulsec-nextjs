@@ -34,9 +34,6 @@ const EMPTY_WEEKS: ContributionWeek[] = Array.from({ length: 26 }, () => ({
   })),
 }))
 
-const DEFAULT_VISIBLE_WEEKS = 26
-const MIN_VISIBLE_WEEKS = 8
-const TARGET_CELL_SIZE = 12
 const CELL_GAP = 4
 const GRID_ROW_COUNT = 7
 
@@ -101,14 +98,27 @@ function formatContributionCount(count: number) {
   return `${count} ${count === 1 ? "contribution" : "contributions"}`
 }
 
+function getVisibleWeekCount(width: number, height: number, weekCount: number) {
+  const maxCellHeight =
+    (height - CELL_GAP * (GRID_ROW_COUNT - 1)) / GRID_ROW_COUNT
+
+  if (maxCellHeight <= 0) return weekCount
+
+  const weeksThatFit = Math.floor(
+    (width + CELL_GAP) / (maxCellHeight + CELL_GAP)
+  )
+
+  return Math.max(1, Math.min(weekCount, weeksThatFit))
+}
+
 export function GitHubHeatmap() {
   const [data, setData] = useState<HeatmapData | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [visibleWeekCount, setVisibleWeekCount] = useState(
-    DEFAULT_VISIBLE_WEEKS
-  )
+  const [visibleWeekCount, setVisibleWeekCount] = useState(0)
   const [chartSize, setChartSize] = useState({ width: 0, height: 0 })
   const chartRef = useRef<HTMLDivElement>(null)
+  const weeks = normalizeWeeks(data?.weeks ?? EMPTY_WEEKS)
+  const weekCount = weeks.length
 
   useEffect(() => {
     let cancelled = false
@@ -152,10 +162,7 @@ export function GitHubHeatmap() {
           : { width, height }
       )
 
-      const nextCount = Math.max(
-        MIN_VISIBLE_WEEKS,
-        Math.floor((width + CELL_GAP) / (TARGET_CELL_SIZE + CELL_GAP))
-      )
+      const nextCount = getVisibleWeekCount(width, height, weekCount)
 
       setVisibleWeekCount((currentCount) =>
         currentCount === nextCount ? currentCount : nextCount
@@ -167,9 +174,8 @@ export function GitHubHeatmap() {
     observer.observe(chart)
 
     return () => observer.disconnect()
-  }, [])
+  }, [weekCount])
 
-  const weeks = normalizeWeeks(data?.weeks ?? EMPTY_WEEKS)
   const visibleWeeks = weeks.slice(-Math.min(visibleWeekCount, weeks.length))
   const todayKey = getLocalDateKey(new Date())
   const maxCellWidth =
@@ -186,8 +192,15 @@ export function GitHubHeatmap() {
     cellSize > 0
       ? cellSize * visibleWeeks.length + CELL_GAP * (visibleWeeks.length - 1)
       : undefined
+  const gridHeight =
+    cellSize > 0
+      ? cellSize * GRID_ROW_COUNT + CELL_GAP * (GRID_ROW_COUNT - 1)
+      : undefined
   const gridStyle = {
     gridTemplateColumns: `repeat(${visibleWeeks.length}, minmax(0, 1fr))`,
+    ...(gridHeight
+      ? { gridTemplateRows: `repeat(${GRID_ROW_COUNT}, ${cellSize}px)` }
+      : {}),
     ...(gridWidth ? { width: `${gridWidth}px` } : {}),
   }
 
@@ -195,10 +208,10 @@ export function GitHubHeatmap() {
     <div className="flex min-h-0 flex-1 flex-col justify-between gap-3">
       <div
         ref={chartRef}
-        className="flex min-h-0 min-w-0 flex-1 items-center justify-center overflow-hidden xl:-translate-y-3"
+        className="flex min-h-0 min-w-0 flex-1 items-center justify-center overflow-hidden"
       >
         <div
-          className="grid w-full grid-flow-col grid-rows-7 gap-1 xl:origin-center xl:scale-[0.95]"
+          className="grid w-full grid-flow-col grid-rows-7 gap-1"
           style={gridStyle}
           aria-label="GitHub contribution calendar"
         >
@@ -215,7 +228,7 @@ export function GitHubHeatmap() {
                   <span
                     key={`${weekIndex}-${dayIndex}`}
                     aria-hidden="true"
-                    className="invisible aspect-square min-w-0"
+                    className="invisible min-w-0"
                   />
                 )
               }
@@ -229,7 +242,7 @@ export function GitHubHeatmap() {
                   key={`${weekIndex}-${dayIndex}`}
                   title={label}
                   aria-label={label}
-                  className={`aspect-square min-w-0 rounded-[5px] border border-border/90 ${
+                  className={`min-w-0 rounded-[3px] border border-border/90 xl:rounded-[5px] ${
                     LEVEL_CLASSES[day?.contributionLevel ?? "NONE"]
                   }`}
                 />

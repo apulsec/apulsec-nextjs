@@ -5,6 +5,7 @@ import { MapPinIcon } from "lucide-react"
 import type { COBEOptions } from "cobe"
 import { Globe } from "@/components/ui/globe"
 import { useTheme } from "@/components/theme-provider"
+import { Meteors } from "@/components/ui/meteors"
 
 export default function LocationGlobe() {
   const { resolvedTheme } = useTheme()
@@ -41,6 +42,20 @@ export default function LocationGlobe() {
 
   return (
     <div className="relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-3xl p-3 xl:p-4">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-70"
+      >
+        <Meteors
+          number={10}
+          minDelay={0.2}
+          maxDelay={2}
+          minDuration={3}
+          maxDuration={7}
+          className="bg-primary/70"
+        />
+      </div>
+
       <div className="relative z-10 flex shrink-0 items-center gap-1 xl:gap-2">
         <MapPinIcon className="size-3.5 sm:size-4 xl:size-6" />
         <h2 className="text-[0.7rem] leading-none font-bold xl:text-base">
@@ -49,7 +64,7 @@ export default function LocationGlobe() {
       </div>
 
       {/* 用相对定位覆盖 Globe 默认的 absolute，让地球在卡片剩余空间中居中。 */}
-      <div className="relative flex min-h-0 flex-1 items-center justify-center">
+      <div className="relative z-10 flex min-h-0 flex-1 items-center justify-center">
         <Globe
           className="relative inset-auto mx-auto aspect-square !h-full max-h-full !w-auto max-w-full"
           config={globeConfig}
