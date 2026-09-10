@@ -41,9 +41,11 @@ export default function LocationGlobe() {
 
   return (
     <div className="relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-3xl p-3 xl:p-4">
-      <div className="relative z-10 flex shrink-0 items-center gap-1.5 xl:gap-2">
-        <MapPinIcon className="size-4 sm:size-5 xl:size-6" />
-        <h2 className="text-sm font-bold xl:text-base">Nanjing, China</h2>
+      <div className="relative z-10 flex shrink-0 items-center gap-1 xl:gap-2">
+        <MapPinIcon className="size-3.5 sm:size-4 xl:size-6" />
+        <h2 className="text-[0.7rem] leading-none font-bold xl:text-base">
+          Nanjing, China
+        </h2>
       </div>
 
       {/* 用相对定位覆盖 Globe 默认的 absolute，让地球在卡片剩余空间中居中。 */}

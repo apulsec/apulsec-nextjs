@@ -38,6 +38,7 @@ const DEFAULT_VISIBLE_WEEKS = 19
 const MIN_VISIBLE_WEEKS = 8
 const TARGET_CELL_SIZE = 12
 const CELL_GAP = 4
+const GRID_ROW_COUNT = 7
 
 const LEVEL_CLASSES: Record<ContributionLevel, string> = {
   NONE: "bg-secondary/55",
@@ -68,6 +69,7 @@ export function GitHubHeatmap() {
   const [visibleWeekCount, setVisibleWeekCount] = useState(
     DEFAULT_VISIBLE_WEEKS
   )
+  const [chartSize, setChartSize] = useState({ width: 0, height: 0 })
   const chartRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -103,7 +105,14 @@ export function GitHubHeatmap() {
 
     const updateVisibleWeekCount = () => {
       const width = chart.clientWidth
-      if (!width) return
+      const height = chart.clientHeight
+      if (!width || !height) return
+
+      setChartSize((currentSize) =>
+        currentSize.width === width && currentSize.height === height
+          ? currentSize
+          : { width, height }
+      )
 
       const nextCount = Math.max(
         MIN_VISIBLE_WEEKS,
@@ -124,15 +133,30 @@ export function GitHubHeatmap() {
 
   const weeks = data?.weeks ?? EMPTY_WEEKS
   const visibleWeeks = weeks.slice(-Math.min(visibleWeekCount, weeks.length))
+  const maxCellWidth =
+    chartSize.width > 0
+      ? (chartSize.width - CELL_GAP * (visibleWeeks.length - 1)) /
+        visibleWeeks.length
+      : 0
+  const maxCellHeight =
+    chartSize.height > 0
+      ? (chartSize.height - CELL_GAP * (GRID_ROW_COUNT - 1)) / GRID_ROW_COUNT
+      : 0
+  const cellSize = Math.max(0, Math.min(maxCellWidth, maxCellHeight))
+  const gridWidth =
+    cellSize > 0
+      ? cellSize * visibleWeeks.length + CELL_GAP * (visibleWeeks.length - 1)
+      : undefined
   const gridStyle = {
     gridTemplateColumns: `repeat(${visibleWeeks.length}, minmax(0, 1fr))`,
+    ...(gridWidth ? { width: `${gridWidth}px` } : {}),
   }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col justify-between gap-3">
       <div
         ref={chartRef}
-        className="flex min-w-0 flex-1 items-center xl:-translate-y-3"
+        className="flex min-h-0 min-w-0 flex-1 items-center justify-center overflow-hidden xl:-translate-y-3"
       >
         <div
           className="grid w-full grid-flow-col grid-rows-7 gap-1"
