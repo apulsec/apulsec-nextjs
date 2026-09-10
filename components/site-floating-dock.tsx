@@ -48,7 +48,7 @@ export function SiteFloatingDock() {
         onClick: () => setTheme(isDark ? "light" : "dark"),
       }}
       desktopClassName={`${themeInverseGlow} fixed bottom-6 left-1/2 z-50 -translate-x-1/2`}
-      mobileClassName={`${themeInverseGlow} fixed right-6 bottom-6 z-50`}
+      mobileClassName="fixed right-6 bottom-6 z-50"
     />
   )
 }

@@ -1,13 +1,13 @@
-"use client";
+"use client"
 /**
  * Note: Use position fixed according to your needs
  * Desktop navbar is better positioned at the bottom
  * Mobile navbar is better positioned at bottom right.
  **/
 
-import { cn } from "@/lib/utils";
-import { IconLayoutNavbarCollapse } from "@tabler/icons-react";
-import Link from "next/link";
+import { cn } from "@/lib/utils"
+import { IconLayoutNavbarCollapse } from "@tabler/icons-react"
+import Link from "next/link"
 import {
   AnimatePresence,
   MotionValue,
@@ -15,18 +15,18 @@ import {
   useMotionValue,
   useSpring,
   useTransform,
-} from "motion/react";
+} from "motion/react"
 
-import { useRef, useState } from "react";
+import { useRef, useState } from "react"
 
 const dockItemClassName =
-  "cursor-pointer border border-black/30 shadow-[0_0_10px_rgb(0_0_0_/_0.18)] transition-[border-color,box-shadow] duration-300 dark:border-white/45 dark:shadow-[0_0_10px_rgb(255_255_255_/_0.22)]";
+  "cursor-pointer border border-black/30 shadow-[0_0_10px_rgb(0_0_0_/_0.18)] transition-[border-color,box-shadow] duration-300 dark:border-white/45 dark:shadow-[0_0_10px_rgb(255_255_255_/_0.22)]"
 
 type FloatingDockAction = {
-  title: string;
-  icon: React.ReactNode;
-  onClick: () => void;
-};
+  title: string
+  icon: React.ReactNode
+  onClick: () => void
+}
 
 export const FloatingDock = ({
   items,
@@ -34,10 +34,10 @@ export const FloatingDock = ({
   mobileClassName,
   endAction,
 }: {
-  items: { title: string; icon: React.ReactNode; href: string }[];
-  desktopClassName?: string;
-  mobileClassName?: string;
-  endAction?: FloatingDockAction;
+  items: { title: string; icon: React.ReactNode; href: string }[]
+  desktopClassName?: string
+  mobileClassName?: string
+  endAction?: FloatingDockAction
 }) => {
   return (
     <>
@@ -52,21 +52,21 @@ export const FloatingDock = ({
         endAction={endAction}
       />
     </>
-  );
-};
+  )
+}
 
 const FloatingDockMobile = ({
   items,
   className,
   endAction,
 }: {
-  items: { title: string; icon: React.ReactNode; href: string }[];
-  className?: string;
-  endAction?: FloatingDockAction;
+  items: { title: string; icon: React.ReactNode; href: string }[]
+  className?: string
+  endAction?: FloatingDockAction
 }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
   return (
-    <div className={cn("relative block md:hidden", className)}>
+    <div className={cn("relative block xl:hidden", className)}>
       <AnimatePresence>
         {open && (
           <motion.div
@@ -97,7 +97,7 @@ const FloatingDockMobile = ({
                   title={item.title}
                   className={cn(
                     "flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-neutral-900",
-                    dockItemClassName,
+                    dockItemClassName
                   )}
                 >
                   <div className="h-4 w-4">{item.icon}</div>
@@ -113,7 +113,7 @@ const FloatingDockMobile = ({
           onClick={() => setOpen(!open)}
           className={cn(
             "flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-neutral-800",
-            dockItemClassName,
+            dockItemClassName
           )}
         >
           <IconLayoutNavbarCollapse className="h-5 w-5 text-neutral-500 dark:text-neutral-400" />
@@ -126,7 +126,7 @@ const FloatingDockMobile = ({
             title={endAction.title}
             className={cn(
               "flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300",
-              dockItemClassName,
+              dockItemClassName
             )}
           >
             <div className="h-4 w-4">{endAction.icon}</div>
@@ -134,26 +134,26 @@ const FloatingDockMobile = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
 const FloatingDockDesktop = ({
   items,
   className,
   endAction,
 }: {
-  items: { title: string; icon: React.ReactNode; href: string }[];
-  className?: string;
-  endAction?: FloatingDockAction;
+  items: { title: string; icon: React.ReactNode; href: string }[]
+  className?: string
+  endAction?: FloatingDockAction
 }) => {
-  const mouseX = useMotionValue(Infinity);
+  const mouseX = useMotionValue(Infinity)
   return (
     <motion.div
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
       className={cn(
-        "mx-auto hidden h-16 items-end gap-4 rounded-2xl bg-gray-50 px-4 pb-3 md:flex dark:bg-neutral-900",
-        className,
+        "mx-auto hidden h-16 items-end gap-4 rounded-2xl bg-gray-50 px-4 pb-3 xl:flex dark:bg-neutral-900",
+        className
       )}
     >
       {items.map((item) => (
@@ -161,8 +161,8 @@ const FloatingDockDesktop = ({
       ))}
       {endAction && <IconContainer mouseX={mouseX} {...endAction} />}
     </motion.div>
-  );
-};
+  )
+}
 
 function IconContainer({
   mouseX,
@@ -171,53 +171,57 @@ function IconContainer({
   href,
   onClick,
 }: {
-  mouseX: MotionValue;
-  title: string;
-  icon: React.ReactNode;
-  href?: string;
-  onClick?: () => void;
+  mouseX: MotionValue
+  title: string
+  icon: React.ReactNode
+  href?: string
+  onClick?: () => void
 }) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null)
 
   const distance = useTransform(mouseX, (val) => {
-    const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
+    const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 }
 
-    return val - bounds.x - bounds.width / 2;
-  });
+    return val - bounds.x - bounds.width / 2
+  })
 
-  const widthTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40]);
-  const heightTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40]);
+  const widthTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40])
+  const heightTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40])
 
-  const widthTransformIcon = useTransform(distance, [-150, 0, 150], [20, 40, 20]);
+  const widthTransformIcon = useTransform(
+    distance,
+    [-150, 0, 150],
+    [20, 40, 20]
+  )
   const heightTransformIcon = useTransform(
     distance,
     [-150, 0, 150],
-    [20, 40, 20],
-  );
+    [20, 40, 20]
+  )
 
   const width = useSpring(widthTransform, {
     mass: 0.1,
     stiffness: 150,
     damping: 12,
-  });
+  })
   const height = useSpring(heightTransform, {
     mass: 0.1,
     stiffness: 150,
     damping: 12,
-  });
+  })
 
   const widthIcon = useSpring(widthTransformIcon, {
     mass: 0.1,
     stiffness: 150,
     damping: 12,
-  });
+  })
   const heightIcon = useSpring(heightTransformIcon, {
     mass: 0.1,
     stiffness: 150,
     damping: 12,
-  });
+  })
 
-  const [hovered, setHovered] = useState(false);
+  const [hovered, setHovered] = useState(false)
 
   const iconContent = (
     <motion.div
@@ -227,7 +231,7 @@ function IconContainer({
       onMouseLeave={() => setHovered(false)}
       className={cn(
         "relative flex aspect-square items-center justify-center rounded-full bg-gray-200 dark:bg-neutral-800",
-        dockItemClassName,
+        dockItemClassName
       )}
     >
       <AnimatePresence>
@@ -249,7 +253,7 @@ function IconContainer({
         {icon}
       </motion.div>
     </motion.div>
-  );
+  )
 
   if (onClick) {
     return (
@@ -262,12 +266,12 @@ function IconContainer({
       >
         {iconContent}
       </button>
-    );
+    )
   }
 
   return (
     <Link href={href ?? "#"} aria-label={title} title={title}>
       {iconContent}
     </Link>
-  );
+  )
 }

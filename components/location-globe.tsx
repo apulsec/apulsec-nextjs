@@ -40,16 +40,16 @@ export default function LocationGlobe() {
   }, [resolvedTheme])
 
   return (
-    <div className="relative flex h-full max-h-[300px] min-h-[250px] w-full flex-col overflow-hidden rounded-3xl p-4">
-      <div className="relative z-10 flex items-center gap-2">
-        <MapPinIcon className="size-6" />
-        <h2 className="text-base font-bold">Nanjing, China</h2>
+    <div className="relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-3xl p-3 xl:p-4">
+      <div className="relative z-10 flex shrink-0 items-center gap-1.5 xl:gap-2">
+        <MapPinIcon className="size-4 sm:size-5 xl:size-6" />
+        <h2 className="text-sm font-bold xl:text-base">Nanjing, China</h2>
       </div>
 
       {/* 用相对定位覆盖 Globe 默认的 absolute，让地球在卡片剩余空间中居中。 */}
       <div className="relative flex min-h-0 flex-1 items-center justify-center">
         <Globe
-          className="relative inset-auto mx-auto aspect-square !h-full !w-auto max-h-[340px] max-w-full"
+          className="relative inset-auto mx-auto aspect-square !h-full max-h-full !w-auto max-w-full"
           config={globeConfig}
         />
       </div>

@@ -38,7 +38,7 @@ export default function Page() {
       </div>
 
       {/* 响应式 Bento 网格：通过命名区域控制每个模块的位置。 */}
-      <section className="mx-auto grid max-w-[375px] grid-cols-2 gap-6 [grid-template-areas:'a_a'_'a_a'_'b_d'_'e_c'_'h_h'_'f_g'_'l_l'] sm:max-w-screen-sm sm:grid-cols-3 sm:[grid-template-areas:'a_a_b'_'a_a_l'_'c_d_d'_'e_f_g'_'h_h_h'] xl:max-w-screen-xl xl:grid-cols-4 xl:[grid-template-areas:'a_a_b_l'_'c_d_d_e'_'f_g_g_h']">
+      <section className="mx-auto grid max-w-[375px] grid-cols-2 gap-6 [grid-template-areas:'a_a'_'a_a'_'b_l'_'c_e'_'f_h'_'d_d'_'g_g'] sm:max-w-screen-sm sm:grid-cols-3 sm:[grid-template-areas:'a_a_b'_'a_a_l'_'c_d_d'_'e_g_g'_'f_h_h'] xl:max-w-screen-xl xl:grid-cols-4 xl:[grid-template-areas:'a_a_b_l'_'c_d_d_e'_'f_g_g_h']">
         <article
           className={`${cardClass} flex min-h-[240px] flex-col justify-between p-6 [grid-area:a] sm:min-h-[270px] xl:min-h-[300px]`}
         >
@@ -64,8 +64,7 @@ export default function Page() {
               🎓 A Grade 2022 CS Student in SEU. Currently pursuing a
               master&apos;s degree at SEU.
               <br />
-              ⚡ Interested in signal processing and
-              front-end development.
+              ⚡ Interested in signal processing and front-end development.
               <br />
               🎮 I am a hardcore anime fan, and I also enjoy playing all kinds
               of games.
@@ -82,7 +81,7 @@ export default function Page() {
         </article>
 
         <article
-          className={`${cardClass} min-h-[250px] [grid-area:b] sm:min-h-[270px] xl:min-h-[300px]`}
+          className={`${cardClass} aspect-square min-h-0 [grid-area:b] sm:aspect-square sm:h-auto sm:min-h-0 sm:self-start xl:aspect-auto xl:h-[300px] xl:min-h-0`}
         >
           <LocationGlobe />
         </article>
@@ -117,13 +116,13 @@ export default function Page() {
         </article>
 
         <article
-          className={`${cardClass} flex aspect-square min-h-0 items-center justify-center p-0 [grid-area:e]`}
+          className={`${cardClass} flex aspect-square min-h-0 items-center justify-center p-0 [grid-area:e] sm:self-start`}
         >
           <CalendarCard />
         </article>
 
         <article
-          className={`${cardClass} flex aspect-square min-h-[160px] flex-col justify-between p-5 [grid-area:c]`}
+          className={`${cardClass} flex aspect-square min-h-0 flex-col justify-between p-5 [grid-area:c] sm:self-start`}
         >
           <div className="flex items-center gap-2 text-sm font-medium">
             <Layers3 className="size-4 text-primary" />
@@ -147,10 +146,10 @@ export default function Page() {
         </article>
 
         <article
-          className={`${cardClass} flex aspect-square min-h-[160px] flex-col justify-between p-5 [grid-area:f]`}
+          className={`${cardClass} flex aspect-square min-h-0 flex-col justify-between p-5 [grid-area:f] sm:self-start`}
         >
           <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden">
-            <div className="origin-center scale-[0.46] [&_canvas]:brightness-0 dark:[&_canvas]:invert sm:scale-[0.54] xl:scale-[0.75]">
+            <div className="origin-center scale-[0.46] sm:scale-[0.54] xl:scale-[0.75] [&_canvas]:brightness-0 dark:[&_canvas]:invert">
               <IconCloud
                 showControl={false}
                 items={[
@@ -175,27 +174,27 @@ export default function Page() {
         </article>
 
         <article
-          className={`${cardClass} flex aspect-square min-h-[160px] flex-col justify-between p-5 [grid-area:g] xl:aspect-auto`}
+          className={`${cardClass} flex aspect-[2/1] min-h-0 flex-col justify-between p-4 [grid-area:g] sm:aspect-auto sm:p-5 xl:aspect-auto`}
         >
           <GitHubHeatmap />
         </article>
 
         <article
-          className={`${cardClass} relative flex min-h-[200px] items-end p-6 [grid-area:h]`}
+          className={`${cardClass} relative flex aspect-square min-h-0 items-end p-4 [grid-area:h] sm:aspect-auto sm:min-h-0 sm:p-6 xl:aspect-auto xl:min-h-[200px]`}
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,oklch(0.95_0.08_230_/_0.8),transparent_35%),linear-gradient(135deg,transparent_30%,oklch(0.55_0.12_240_/_0.18))] dark:bg-[radial-gradient(circle_at_25%_20%,oklch(0.55_0.12_240_/_0.25),transparent_35%),linear-gradient(135deg,transparent_30%,oklch(0.35_0.12_240_/_0.3))]" />
           <div className="relative max-w-lg">
             <p className="text-xs tracking-[0.24em] text-primary uppercase">
               Digital garden
             </p>
-            <p className="mt-3 text-2xl font-medium tracking-tight sm:text-3xl">
+            <p className="mt-3 text-xl leading-tight font-medium tracking-tight sm:text-3xl">
               保持好奇，持续创造。
             </p>
           </div>
         </article>
 
         <article
-          className={`relative flex aspect-square h-full min-h-[200px] flex-col p-0 [grid-area:l] sm:min-h-[270px] xl:h-[300px] xl:min-h-0`}
+          className={`relative flex aspect-square min-h-0 flex-col p-0 [grid-area:l] sm:aspect-square sm:min-h-0 sm:self-start xl:aspect-auto xl:h-[300px] xl:min-h-0`}
         >
           <PixelImageCarousel />
         </article>
