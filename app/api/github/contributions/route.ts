@@ -62,7 +62,7 @@ export async function GET() {
 
   const to = new Date()
   const from = new Date(to)
-  from.setUTCMonth(from.getUTCMonth() - 4)
+  from.setUTCMonth(from.getUTCMonth() - 6)
 
   try {
     const response = await fetch("https://api.github.com/graphql", {

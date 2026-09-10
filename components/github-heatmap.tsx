@@ -26,7 +26,7 @@ type HeatmapData = {
   weeks: ContributionWeek[]
 }
 
-const EMPTY_WEEKS: ContributionWeek[] = Array.from({ length: 19 }, () => ({
+const EMPTY_WEEKS: ContributionWeek[] = Array.from({ length: 26 }, () => ({
   contributionDays: Array.from({ length: 7 }, () => ({
     contributionCount: 0,
     contributionLevel: "NONE" as const,
@@ -34,7 +34,7 @@ const EMPTY_WEEKS: ContributionWeek[] = Array.from({ length: 19 }, () => ({
   })),
 }))
 
-const DEFAULT_VISIBLE_WEEKS = 19
+const DEFAULT_VISIBLE_WEEKS = 26
 const MIN_VISIBLE_WEEKS = 8
 const TARGET_CELL_SIZE = 12
 const CELL_GAP = 4
@@ -48,11 +48,49 @@ const LEVEL_CLASSES: Record<ContributionLevel, string> = {
   FOURTH_QUARTILE: "bg-primary",
 }
 
+function getLocalDateKey(date: Date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+
+  return `${year}-${month}-${day}`
+}
+
+function getMondayDateKey(dateString: string) {
+  const date = new Date(`${dateString}T00:00:00Z`)
+  const daysFromMonday = (date.getUTCDay() + 6) % 7
+
+  date.setUTCDate(date.getUTCDate() - daysFromMonday)
+
+  return date.toISOString().slice(0, 10)
+}
+
+function normalizeWeeks(weeks: ContributionWeek[]) {
+  const daysByWeek = new Map<string, ContributionDay[]>()
+
+  for (const week of weeks) {
+    for (const day of week.contributionDays) {
+      if (!day.date) continue
+
+      const mondayDateKey = getMondayDateKey(day.date)
+      const days = daysByWeek.get(mondayDateKey) ?? []
+      days.push(day)
+      daysByWeek.set(mondayDateKey, days)
+    }
+  }
+
+  if (daysByWeek.size === 0) return weeks
+
+  return [...daysByWeek.entries()]
+    .sort(([firstDate], [secondDate]) => firstDate.localeCompare(secondDate))
+    .map(([, contributionDays]) => ({ contributionDays }))
+}
+
 function getWeekDays(week: ContributionWeek) {
   const days: Array<ContributionDay | undefined> = Array(7).fill(undefined)
 
   for (const day of week.contributionDays) {
-    const dayIndex = new Date(`${day.date}T00:00:00Z`).getUTCDay()
+    const dayIndex = (new Date(`${day.date}T00:00:00Z`).getUTCDay() + 6) % 7
     days[dayIndex] = day
   }
 
@@ -131,8 +169,9 @@ export function GitHubHeatmap() {
     return () => observer.disconnect()
   }, [])
 
-  const weeks = data?.weeks ?? EMPTY_WEEKS
+  const weeks = normalizeWeeks(data?.weeks ?? EMPTY_WEEKS)
   const visibleWeeks = weeks.slice(-Math.min(visibleWeekCount, weeks.length))
+  const todayKey = getLocalDateKey(new Date())
   const maxCellWidth =
     chartSize.width > 0
       ? (chartSize.width - CELL_GAP * (visibleWeeks.length - 1)) /
@@ -159,7 +198,7 @@ export function GitHubHeatmap() {
         className="flex min-h-0 min-w-0 flex-1 items-center justify-center overflow-hidden xl:-translate-y-3"
       >
         <div
-          className="grid w-full grid-flow-col grid-rows-7 gap-1"
+          className="grid w-full grid-flow-col grid-rows-7 gap-1 xl:origin-center xl:scale-[0.95]"
           style={gridStyle}
           aria-label="GitHub contribution calendar"
         >
@@ -167,6 +206,20 @@ export function GitHubHeatmap() {
             const days = getWeekDays(week)
 
             return days.map((day, dayIndex) => {
+              const isFutureDay =
+                weekIndex === visibleWeeks.length - 1 &&
+                (!day?.date || day.date > todayKey)
+
+              if (isFutureDay) {
+                return (
+                  <span
+                    key={`${weekIndex}-${dayIndex}`}
+                    aria-hidden="true"
+                    className="invisible aspect-square min-w-0"
+                  />
+                )
+              }
+
               const label = day?.date
                 ? `${day.date}: ${formatContributionCount(day.contributionCount)}`
                 : "No contribution data"
@@ -176,7 +229,7 @@ export function GitHubHeatmap() {
                   key={`${weekIndex}-${dayIndex}`}
                   title={label}
                   aria-label={label}
-                  className={`aspect-square min-w-0 rounded-[3px] border border-border/90 ${
+                  className={`aspect-square min-w-0 rounded-[5px] border border-border/90 ${
                     LEVEL_CLASSES[day?.contributionLevel ?? "NONE"]
                   }`}
                 />
@@ -209,7 +262,7 @@ export function GitHubHeatmap() {
           ).map((level) => (
             <span
               key={level}
-              className={`size-2.5 rounded-[2px] border border-border/90 ${LEVEL_CLASSES[level]}`}
+              className={`size-2.5 rounded-[4px] border border-border/90 ${LEVEL_CLASSES[level]}`}
             />
           ))}
         </div>
