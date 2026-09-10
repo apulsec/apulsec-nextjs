@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import Image from "next/image"
 
 import { cn } from "@/lib/utils"
 
@@ -54,6 +55,10 @@ export const PixelImage = ({
 }: PixelImageProps) => {
   const [isVisible, setIsVisible] = useState(false)
   const [showColor, setShowColor] = useState(false)
+  const [isComplete, setIsComplete] = useState(false)
+  const [animationDelays, setAnimationDelays] = useState<number[] | null>(
+    null
+  )
 
   const MIN_GRID = 1
   const MAX_GRID = 16
@@ -75,20 +80,6 @@ export const PixelImage = ({
     return isValidGrid(customGrid) ? customGrid! : DEFAULT_GRIDS[grid]
   }, [customGrid, grid])
 
-  useEffect(() => {
-    const animationFrame = requestAnimationFrame(() => {
-      setIsVisible(true)
-    })
-    const colorTimeout = setTimeout(() => {
-      setShowColor(true)
-    }, colorRevealDelay)
-
-    return () => {
-      cancelAnimationFrame(animationFrame)
-      clearTimeout(colorTimeout)
-    }
-  }, [colorRevealDelay])
-
   const pieces = useMemo(() => {
     const total = rows * cols
     return Array.from({ length: total }, (_, index) => {
@@ -105,10 +96,42 @@ export const PixelImage = ({
     })
   }, [rows, cols, maxAnimationDelay, src])
 
+  useEffect(() => {
+    let revealFrame: number | undefined
+    const animationFrame = requestAnimationFrame(() => {
+      setAnimationDelays(
+        pieces.map(() => Math.random() * maxAnimationDelay)
+      )
+
+      revealFrame = requestAnimationFrame(() => {
+        setIsVisible(true)
+      })
+    })
+    const colorTimeout = setTimeout(() => {
+      setShowColor(true)
+    }, colorRevealDelay)
+    const completeTimeout = setTimeout(
+      () => setIsComplete(true),
+      Math.max(0, maxAnimationDelay + pixelFadeInDuration - 50)
+    )
+
+    return () => {
+      cancelAnimationFrame(animationFrame)
+      if (revealFrame !== undefined) cancelAnimationFrame(revealFrame)
+      clearTimeout(colorTimeout)
+      clearTimeout(completeTimeout)
+    }
+  }, [
+    colorRevealDelay,
+    maxAnimationDelay,
+    pixelFadeInDuration,
+    pieces,
+  ])
+
   return (
     <div
       className={cn(
-        "relative h-72 w-72 select-none md:h-96 md:w-96",
+        "relative aspect-square h-72 w-72 select-none overflow-hidden rounded-3xl md:h-96 md:w-96",
         className
       )}
     >
@@ -121,15 +144,17 @@ export const PixelImage = ({
           )}
           style={{
             clipPath: piece.clipPath,
-            transitionDelay: `${piece.delay}ms`,
+            transitionDelay: `${animationDelays?.[index] ?? piece.delay}ms`,
             transitionDuration: `${pixelFadeInDuration}ms`,
           }}
         >
-          <img
+          <Image
             src={src}
             alt={`Pixel image piece ${index + 1}`}
+            fill
+            sizes="100%"
             className={cn(
-              "z-1 rounded-[2.5rem] object-cover",
+              "z-1 object-cover",
               grayscaleAnimation && (showColor ? "grayscale-0" : "grayscale")
             )}
             style={{
@@ -141,6 +166,17 @@ export const PixelImage = ({
           />
         </div>
       ))}
+      <Image
+        src={src}
+        alt=""
+        aria-hidden="true"
+        fill
+        sizes="100%"
+        className={cn(
+          "pointer-events-none z-10 object-cover opacity-0",
+          isComplete && "opacity-100"
+        )}
+      />
     </div>
   )
 }

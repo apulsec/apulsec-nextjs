@@ -40,7 +40,7 @@ export default function LocationGlobe() {
   }, [resolvedTheme])
 
   return (
-    <div className="relative flex h-full min-h-[250px] w-full flex-col overflow-hidden rounded-3xl p-4">
+    <div className="relative flex h-full max-h-[300px] min-h-[250px] w-full flex-col overflow-hidden rounded-3xl p-4">
       <div className="relative z-10 flex items-center gap-2">
         <MapPinIcon className="size-6" />
         <h2 className="text-base font-bold">Nanjing, China</h2>
@@ -49,7 +49,7 @@ export default function LocationGlobe() {
       {/* 用相对定位覆盖 Globe 默认的 absolute，让地球在卡片剩余空间中居中。 */}
       <div className="relative flex min-h-0 flex-1 items-center justify-center">
         <Globe
-          className="relative inset-auto mx-auto aspect-square w-[98%] max-w-[340px]"
+          className="relative inset-auto mx-auto aspect-square !h-full !w-auto max-h-[340px] max-w-full"
           config={globeConfig}
         />
       </div>

@@ -1,6 +1,6 @@
 # 个人主页项目交接文档
 
-更新时间：2026-09-09  
+更新时间：2026-09-10
 项目目录：`C:\AmyCODE\.test\mynext-sui`
 
 ## 1. 项目概览
@@ -84,7 +84,7 @@ const cardClass =
 | `f` | 技术栈图标云 | `IconCloud` |
 | `g` | 关于这个主页 | 链接到 `/about` |
 | `h` | Digital garden 宣传卡片 | 背景渐变 |
-| `l` | 快速入口 | Blog/About 两个入口 |
+| `l` | 动漫图片像素轮播 | `PixelImageCarousel`，点击或键盘切换 |
 
 ## 3. 关键组件说明
 
@@ -108,9 +108,10 @@ const cardClass =
 - 南京标记使用蓝色。
 - 外边缘使用淡蓝色。
 - `dark` 参数根据 `next-themes` 的 `resolvedTheme` 切换地图像素与地球底色的明暗关系。
-- 地球在模块剩余空间中居中显示，最大宽度为 `340px`。
+- 地球模块最大高度为 `300px`，避免在宽屏下把 Bento 网格行高撑大。
+- 地球画布在剩余空间中按正方形尺寸自适应，宽度跟随可用高度，避免被压扁。
 
-如果调整地球大小，主要修改 `LocationGlobe` 中 `Globe` 的 `w-[98%]` 和 `max-w-[340px]`。如果修改动画、拖拽或 Cobe 生命周期，则编辑 `components/ui/globe.tsx`。
+如果调整地球大小，主要修改 `LocationGlobe` 中外层的 `max-h-[300px]`、`min-h-[250px]` 以及 `Globe` 的 `!h-full !w-auto`。如果修改动画、拖拽或 Cobe 生命周期，则编辑 `components/ui/globe.tsx`。
 
 ### 3.3 技术栈图标云：`components/ui/icon-cloud.tsx`
 
@@ -170,6 +171,30 @@ const CLOUD_RADIUS = 125
 
 如果继续放大图标，建议同时观察卡片尺寸，因为 Canvas 当前是 `400 × 400`，过度放大可能导致图标超出卡片可视区域。
 
+### 3.4 动漫图片像素轮播：`components/pixel-image-carousel.tsx`
+
+首页右上角图片模块现在使用 `public/images/homepage/` 中的三张本地图片：
+
+- `anime-blue.png`
+- `anime-white.png`
+- `anime-blonde.jpg`
+
+图片通过 `components/ui/pixel-image.tsx` 以 `next/image` 的 `fill` 模式显示，并使用 `object-cover` 自动裁剪填充模块。模块本身无内边距，图片作为视觉卡片的外边缘显示。
+
+交互和动画规则：
+
+- 点击图片、按 `Enter` 或空格键可以切换图片。
+- 每 10 秒自动切换一次图片。
+- 手动切换后会重新开始 10 秒计时。
+- 悬浮时图片卡片和边缘放大 `1.02` 倍；小点容器位于独立的非缩放层，因此保持固定尺寸。
+- 像素切片动画完成后，会直接显示一层完整图片覆盖切片边缘，避免抗锯齿产生的白色网格线或闪烁。
+
+`PixelImage` 的 hydration 处理需要保持以下约束：
+
+- 服务端和客户端首次渲染使用基于图片路径的稳定延迟。
+- 随机延迟只能在 hydration 完成后的 `requestAnimationFrame` 中生成，用于恢复错落的动画效果。
+- `clipPath` 字符串必须保持服务端和客户端格式一致，不能在渲染阶段直接调用 `Math.random()`。
+
 ## 4. 页面尺寸与位置调整方法
 
 ### 调整卡片高度
@@ -185,6 +210,14 @@ xl:min-h-[300px]
 ```
 
 `min-h-*` 是最直接的高度控制方式。带有 `aspect-square` 的模块会优先保持正方形，修改高度时需要同步考虑是否移除或保留 `aspect-square`。
+
+图片模块 `l` 当前使用以下高度规则：
+
+```tsx
+min-h-[200px] sm:min-h-[270px] xl:h-[300px] xl:min-h-0
+```
+
+宽屏下图片卡片的 `300px` 高度需要与地球模块的 `max-h-[300px]` 配合调整；如果一侧改变，可能再次出现同排卡片高度不一致。
 
 ### 调整卡片位置
 
@@ -230,7 +263,8 @@ pnpm build
 当前已验证：
 
 - `pnpm typecheck`：通过。
-- `pnpm lint -- app/page.tsx`：通过。
+- `pnpm lint -- app/page.tsx components/pixel-image-carousel.tsx components/ui/pixel-image.tsx components/location-globe.tsx`：通过。
+- 本地开发页请求：HTTP `200`。
 - `git diff --check`：通过。
 
 注意：`components/ui/icon-cloud.tsx` 当前仍有两个已有的 `react-hooks/set-state-in-effect` lint 错误，分别来自：
@@ -253,6 +287,8 @@ git diff
 
 - `HANDOFF.md`
 - `app/page.tsx`
+- `components/pixel-image-carousel.tsx`
+- `components/ui/pixel-image.tsx`
 - `components/location-globe.tsx`
 - `components/site-floating-dock.tsx`
 - `components/ui/floating-dock.tsx`
@@ -260,6 +296,9 @@ git diff
 - `components/ui/icon-cloud.tsx`
 - `public/icons/pytorch.svg`
 - `public/icons/matlab.svg`
+- `public/images/homepage/anime-blue.png`
+- `public/images/homepage/anime-white.png`
+- `public/images/homepage/anime-blonde.jpg`
 
 这些修改包含此前的主页布局、浮动导航、主题、地球仪和图标云迭代。不要在不了解变更来源的情况下使用 `git reset --hard` 或 `git checkout --` 覆盖工作区。
 
@@ -284,6 +323,9 @@ git diff
 - 导航栏动画实现：`components/ui/floating-dock.tsx`
 - 地球显示和南京标记：`components/location-globe.tsx`
 - 地球 Canvas 实现：`components/ui/globe.tsx`
+- 动漫图片轮播：`components/pixel-image-carousel.tsx`
+- 像素切片、裁剪和 hydration 动画：`components/ui/pixel-image.tsx`
+- 动漫图片资源：`public/images/homepage/`
 - 日期和时间：`components/calendar-card.tsx`
 - 技术栈图标云：`components/ui/icon-cloud.tsx`
 - 全局颜色、圆角、字体和主题变量：`app/globals.css`

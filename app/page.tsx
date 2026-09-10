@@ -195,7 +195,7 @@ export default function Page() {
         </article>
 
         <article
-          className={`${cardClass} flex aspect-square min-h-[160px] flex-col p-5 [grid-area:l] xl:aspect-auto xl:min-h-[300px]`}
+          className={`relative flex aspect-square h-full min-h-[200px] flex-col p-0 [grid-area:l] sm:min-h-[270px] xl:h-[300px] xl:min-h-0`}
         >
           <PixelImageCarousel />
         </article>
