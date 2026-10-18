@@ -1,3 +1,10 @@
+import { createPageMetadata } from "@/lib/metadata"
+
+export const metadata = createPageMetadata(
+  "关于我",
+  "关于 apulsec：一名正在学习 Web 开发的开发者。"
+)
+
 export default function AboutPage() {
   return (
     <main className="mx-auto max-w-3xl p-6">
