@@ -1,6 +1,12 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from "react"
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react"
 import { Pause, Play } from "lucide-react"
 import { renderToString } from "react-dom/server"
 
@@ -25,6 +31,22 @@ interface IconCloudProps {
 const EMPTY_ITEMS: React.ReactNode[] = []
 const ICON_CANVAS_SIZE = 48
 const CLOUD_RADIUS = 125
+const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)"
+
+function subscribeToReducedMotion(onChange: () => void) {
+  const mediaQuery = window.matchMedia(REDUCED_MOTION_QUERY)
+  mediaQuery.addEventListener("change", onChange)
+  return () => mediaQuery.removeEventListener("change", onChange)
+}
+
+function getReducedMotionSnapshot() {
+  return window.matchMedia(REDUCED_MOTION_QUERY).matches
+}
+
+function getServerReducedMotionSnapshot() {
+  // Keep SSR and hydration consistent; do not animate before reading the preference.
+  return true
+}
 
 function easeOutCubic(t: number): number {
   return 1 - Math.pow(1 - t, 3)
@@ -37,9 +59,14 @@ export function IconCloud({
   showControl = true,
 }: IconCloudProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [iconPositions, setIconPositions] = useState<Icon[]>([])
   const [isDragging, setIsDragging] = useState(false)
-  const [isPaused, setIsPaused] = useState(false)
+  const [isManuallyPaused, setIsManuallyPaused] = useState(false)
+  const prefersReducedMotion = useSyncExternalStore(
+    subscribeToReducedMotion,
+    getReducedMotionSnapshot,
+    getServerReducedMotionSnapshot
+  )
+  const isPaused = prefersReducedMotion || isManuallyPaused
   const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 })
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const [targetRotation, setTargetRotation] = useState<{
@@ -56,27 +83,14 @@ export function IconCloud({
   const iconCanvasesRef = useRef<HTMLCanvasElement[]>([])
   const imagesLoadedRef = useRef<boolean[]>([])
 
-  // Pause animation if user prefers reduced motion
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
-    if (mediaQuery.matches) {
-      setIsPaused(true)
-    }
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      setIsPaused(e.matches)
-    }
-
-    mediaQuery.addEventListener("change", handleChange)
-    return () => mediaQuery.removeEventListener("change", handleChange)
-  }, [])
-
   // Create icon canvases once when icons/images change
   useEffect(() => {
     if (!icons && !images && !items) return
 
     const itemList = items ?? icons ?? images ?? EMPTY_ITEMS
-    imagesLoadedRef.current = new Array(itemList.length).fill(false)
+    const loaded = new Array<boolean>(itemList.length).fill(false)
+    imagesLoadedRef.current = loaded
+    let disposed = false
 
     const newIconCanvases = itemList.map((item, index) => {
       const offscreen = document.createElement("canvas")
@@ -89,33 +103,29 @@ export function IconCloud({
           // 处理 public 目录中的 SVG 或其他图片资源。
           const img = new Image()
           img.crossOrigin = "anonymous"
-          img.src = item
           img.onload = () => {
+            if (disposed) return
             offCtx.clearRect(0, 0, offscreen.width, offscreen.height)
-            offCtx.drawImage(
-              img,
-              0,
-              0,
-              ICON_CANVAS_SIZE,
-              ICON_CANVAS_SIZE
-            )
+            offCtx.drawImage(img, 0, 0, ICON_CANVAS_SIZE, ICON_CANVAS_SIZE)
 
-            imagesLoadedRef.current[index] = true
+            loaded[index] = true
           }
           img.onerror = () => {
-            imagesLoadedRef.current[index] = true
+            if (!disposed) loaded[index] = true
           }
+          img.src = item
         } else {
           // 将 React SVG 图标转成图片，统一交给 Canvas 绘制。
           const svgString = renderToString(item)
           const img = new Image()
           img.onload = () => {
+            if (disposed) return
             offCtx.clearRect(0, 0, offscreen.width, offscreen.height)
             offCtx.drawImage(img, 0, 0, ICON_CANVAS_SIZE, ICON_CANVAS_SIZE)
-            imagesLoadedRef.current[index] = true
+            loaded[index] = true
           }
           img.onerror = () => {
-            imagesLoadedRef.current[index] = true
+            if (!disposed) loaded[index] = true
           }
           img.src = "data:image/svg+xml;base64," + btoa(svgString)
         }
@@ -124,13 +134,15 @@ export function IconCloud({
     })
 
     iconCanvasesRef.current = newIconCanvases
+    return () => {
+      disposed = true
+    }
   }, [icons, images, items])
 
-  // Generate initial icon positions on a sphere
-  useEffect(() => {
-    const itemList = items ?? icons ?? images ?? EMPTY_ITEMS
+  // Positions depend only on item count, not on loaded assets or animation state.
+  const numIcons = (items ?? icons ?? images ?? EMPTY_ITEMS).length || 20
+  const iconPositions = useMemo(() => {
     const newIcons: Icon[] = []
-    const numIcons = itemList.length || 20
 
     // Fibonacci sphere parameters
     const offset = 2 / numIcons
@@ -153,8 +165,8 @@ export function IconCloud({
         id: i,
       })
     }
-    setIconPositions(newIcons)
-  }, [icons, images, items])
+    return newIcons
+  }, [numIcons])
 
   // Handle mouse events
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -199,6 +211,13 @@ export function IconCloud({
         )
 
         const duration = Math.min(2000, Math.max(800, distance * 1000))
+
+        if (prefersReducedMotion) {
+          // Explicit selection is immediate rather than an animated transition.
+          rotationRef.current = { x: targetX, y: targetY }
+          setTargetRotation(null)
+          return
+        }
 
         setTargetRotation({
           x: targetX,
@@ -258,7 +277,7 @@ export function IconCloud({
         const distance = Math.sqrt(dx * dx + dy * dy)
         const speed = 0.003 + (distance / maxDistance) * 0.01
 
-        if (targetRotation) {
+        if (targetRotation && !isPaused) {
           const elapsed = performance.now() - targetRotation.startTime
           const progress = Math.min(1, elapsed / targetRotation.duration)
           const easedProgress = easeOutCubic(progress)
@@ -336,8 +355,7 @@ export function IconCloud({
         const hasPendingAssets =
           Boolean(icons || images || items) &&
           !imagesLoadedRef.current.every((loaded) => loaded)
-        const shouldContinue =
-          !isPaused || isDragging || targetRotation !== null || hasPendingAssets
+        const shouldContinue = !isPaused || isDragging || hasPendingAssets
 
         if (shouldContinue) {
           animationFrameRef.current = requestAnimationFrame(animate)
@@ -381,8 +399,20 @@ export function IconCloud({
         <Button
           variant="outline"
           size="icon"
-          onClick={() => setIsPaused(!isPaused)}
-          aria-label={isPaused ? "Play Animation" : "Pause Animation"}
+          onClick={() => setIsManuallyPaused((paused) => !paused)}
+          disabled={prefersReducedMotion}
+          aria-label={
+            prefersReducedMotion
+              ? "Animation paused: reduced motion enabled"
+              : isPaused
+                ? "Play Animation"
+                : "Pause Animation"
+          }
+          title={
+            prefersReducedMotion
+              ? "Animation paused: reduced motion enabled"
+              : undefined
+          }
           className="absolute top-2 right-2"
         >
           {isPaused ? <Play size={16} /> : <Pause size={16} />}
