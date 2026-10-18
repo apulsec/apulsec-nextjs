@@ -21,6 +21,12 @@ import LocationGlobe from "@/components/location-globe"
 import { PixelImageCarousel } from "@/components/pixel-image-carousel"
 import { IconCloud } from "@/components/ui/icon-cloud"
 import { TypingAnimation } from "@/components/ui/typing-animation"
+import { createPageMetadata } from "@/lib/metadata"
+
+export const metadata = createPageMetadata(
+  "首页",
+  "欢迎来到 apulsec 的数字花园。我在东南大学攻读人工智能硕士，关注信号处理与前端开发，在这里整理学习记录、实践经验和生活中的想法。"
+)
 
 const cardClass =
   "relative overflow-hidden rounded-3xl border border-border/60 bg-secondary/35 shadow-[0_18px_60px_rgb(23_77_132_/_0.08)] backdrop-blur-xl"
@@ -40,6 +46,7 @@ export default function Page() {
       {/* 响应式 Bento 网格：通过命名区域控制每个模块的位置。 */}
       <section className="mx-auto grid max-w-[375px] grid-cols-2 gap-6 [grid-template-areas:'a_a'_'a_a'_'b_l'_'c_e'_'f_h'_'d_d'_'g_g'] sm:max-w-screen-sm sm:grid-cols-3 sm:[grid-template-areas:'a_a_b'_'a_a_l'_'c_d_d'_'e_g_g'_'f_h_h'] xl:max-w-screen-xl xl:grid-cols-4 xl:[grid-template-areas:'a_a_b_l'_'c_d_d_e'_'f_g_g_h']">
         <article
+          lang="en"
           className={`${cardClass} flex min-h-[240px] flex-col justify-between p-6 [grid-area:a] sm:min-h-[270px] xl:h-[300px] xl:min-h-0 xl:self-start`}
         >
           <div className="flex h-full min-h-0 flex-col justify-between gap-6 sm:gap-8">
@@ -104,6 +111,7 @@ export default function Page() {
         </article>
 
         <article
+          lang="en"
           className={`${cardClass} aspect-square min-h-0 [grid-area:b] sm:aspect-square sm:h-auto sm:min-h-0 sm:self-start xl:aspect-auto xl:h-[300px] xl:min-h-0`}
         >
           <LocationGlobe />
@@ -117,7 +125,9 @@ export default function Page() {
               <BookOpenText className="size-4 text-primary" />
               最新文章
             </div>
-            <span className="text-xs text-muted-foreground">Blog</span>
+            <span lang="en" className="text-xs text-muted-foreground">
+              Blog
+            </span>
           </div>
 
           <div>
@@ -139,6 +149,7 @@ export default function Page() {
         </article>
 
         <article
+          lang="en"
           className={`${cardClass} flex aspect-square min-h-0 items-center justify-center p-0 [grid-area:e] sm:self-start`}
         >
           <CalendarCard />
@@ -207,7 +218,10 @@ export default function Page() {
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,oklch(0.95_0.08_230_/_0.8),transparent_35%),linear-gradient(135deg,transparent_30%,oklch(0.55_0.12_240_/_0.18))] dark:bg-[radial-gradient(circle_at_25%_20%,oklch(0.55_0.12_240_/_0.25),transparent_35%),linear-gradient(135deg,transparent_30%,oklch(0.35_0.12_240_/_0.3))]" />
           <div className="relative max-w-lg">
-            <p className="text-xs tracking-[0.24em] text-primary uppercase">
+            <p
+              lang="en"
+              className="text-xs tracking-[0.24em] text-primary uppercase"
+            >
               Digital garden
             </p>
             <p className="mt-3 text-xl leading-tight font-medium tracking-tight sm:text-3xl">

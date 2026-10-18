@@ -1,3 +1,10 @@
+import { createPageMetadata } from "@/lib/metadata"
+
+export const metadata = createPageMetadata(
+  "博客",
+  "apulsec 的博客正在建设中，这里计划展示文章和学习记录。"
+)
+
 export default function BlogPage() {
   return (
     <main className="mx-auto max-w-3xl p-6">

@@ -213,6 +213,7 @@ export function GitHubHeatmap() {
         <div
           className="grid w-full grid-flow-col grid-rows-7 gap-1"
           style={gridStyle}
+          lang="en"
           aria-label="GitHub contribution calendar"
         >
           {visibleWeeks.flatMap((week, weekIndex) => {
@@ -258,7 +259,9 @@ export function GitHubHeatmap() {
             配置 GitHub 后显示真实提交
           </span>
         ) : data ? (
-          <span>{formatContributionCount(data.totalContributions)}</span>
+          <span lang="en">
+            {formatContributionCount(data.totalContributions)}
+          </span>
         ) : (
           <span>设置账号后加载</span>
         )}
